@@ -58,17 +58,24 @@ public class ConsultaReciboFrame extends JFrame {
 
     private void cargarTabla() {
         modelo.setRowCount(0);
-        for (Lectura l : apartamento.getHistorialLecturas()) {
+
+        // Recalcular lectura inicial de cada lectura posterior automáticamente
+        for (int i = 0; i < apartamento.getHistorialLecturas().size(); i++) {
+            Lectura actual = apartamento.getHistorialLecturas().get(i);
+            if (i > 0) {
+                Lectura anterior = apartamento.getHistorialLecturas().get(i - 1);
+                actual.setLecturas(anterior.getLecturaActual(), actual.getLecturaActual());
+            }
             modelo.addRow(new Object[]{
-                l.getLecturaInicial(),
-                l.getFechaInicial(),
-                l.getLecturaActual(),
-                l.getFechaActual(),
-                l.getConsumo(),
-                l.getValorAcueducto(),
-                l.getValorAlcantarillado(),
-                l.getValorPagar(),
-                l.getEstado()
+                actual.getLecturaInicial(),
+                actual.getFechaInicial(),
+                actual.getLecturaActual(),
+                actual.getFechaActual(),
+                actual.getConsumo(),
+                actual.getValorAcueducto(),
+                actual.getValorAlcantarillado(),
+                actual.getValorPagar(),
+                actual.getEstado()
             });
         }
     }
@@ -82,7 +89,6 @@ public class ConsultaReciboFrame extends JFrame {
 
         Lectura l = apartamento.getHistorialLecturas().get(fila);
 
-        // Guardar PDF en carpeta del apartamento
         try {
             String baseDir = System.getProperty("user.dir");
             File aptoDir = new File(baseDir, "Apartamento_" + apartamento.getNumero());

@@ -20,20 +20,20 @@ public class RegistrarLecturaFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Encabezados modificados
+        // Encabezados
         modelo = new DefaultTableModel(
-    new String[]{
-        "Lectura Anterior",
-        "Fecha Anterior",
-        "Lectura Actual",
-        "Fecha Actual",
-        "Consumo",
-        "Valor Acueducto",
-        "Valor Alcantarillado",
-        "Total",
-        "Estado"
-    }, 0
-);
+            new String[]{
+                "Lectura Anterior",
+                "Fecha Anterior",
+                "Lectura Actual",
+                "Fecha Actual",
+                "Consumo",
+                "Valor Acueducto",
+                "Valor Alcantarillado",
+                "Total",
+                "Estado"
+            }, 0
+        );
 
         tabla = new JTable(modelo);
         cargarTabla();
@@ -46,7 +46,7 @@ public class RegistrarLecturaFrame extends JFrame {
         panel.add(txtLecturaActual);
 
         panel.add(new JLabel("Fecha Actual:"));
-        txtFechaActual = new JTextField(LocalDate.now().toString()); // ✅ Fecha por defecto
+        txtFechaActual = new JTextField(LocalDate.now().toString());
         panel.add(txtFechaActual);
 
         // Botones
@@ -65,25 +65,25 @@ public class RegistrarLecturaFrame extends JFrame {
     }
 
     private void cargarTabla() {
-    modelo.setRowCount(0);
-    for (Lectura l : apartamento.getHistorialLecturas()) {
-        modelo.addRow(new Object[]{
-            l.getLecturaInicial(),      // Lectura Anterior
-            l.getFechaInicial(),        // Fecha Anterior
-            l.getLecturaActual(),       // Lectura Actual
-            l.getFechaActual(),         // Fecha Actual
-            l.getConsumo(),             // Consumo
-            l.getValorAcueducto(),      // Valor Acueducto
-            l.getValorAlcantarillado(), // Valor Alcantarillado
-            l.getValorPagar(),          // Total
-            l.getEstado()               // Estado
-        });
+        modelo.setRowCount(0);
+        for (Lectura l : apartamento.getHistorialLecturas()) {
+            modelo.addRow(new Object[]{
+                l.getLecturaInicial(),
+                l.getFechaInicial(),
+                l.getLecturaActual(),
+                l.getFechaActual(),
+                l.getConsumo(),
+                l.getValorAcueducto(),
+                l.getValorAlcantarillado(),
+                l.getValorPagar(),
+                l.getEstado()
+            });
+        }
     }
-}
 
     private void registrarNuevaLectura() {
         try {
-            double lecturaActual = Double.parseDouble(txtLecturaActual.getText());
+            double lecturaActual = Double.parseDouble(txtLecturaActual.getText().trim());
             LocalDate fechaActual = LocalDate.parse(txtFechaActual.getText().trim());
 
             double lecturaAnterior;
@@ -105,19 +105,27 @@ public class RegistrarLecturaFrame extends JFrame {
                 return;
             }
 
-            Lectura nueva = new Lectura(
-    lecturaAnterior,
-    lecturaActual,
-    fechaAnterior,
-    fechaActual
-);
-apartamento.getHistorialLecturas().add(nueva);
+            // Crear nueva lectura
+            Lectura nueva = new Lectura(lecturaAnterior, lecturaActual, fechaAnterior, fechaActual);
+            apartamento.getHistorialLecturas().add(nueva);
 
+            // Ajustar lecturas posteriores automáticamente si se modifica la primera lectura
+            if (apartamento.getHistorialLecturas().size() > 1) {
+                for (int i = 1; i < apartamento.getHistorialLecturas().size(); i++) {
+                    Lectura actual = apartamento.getHistorialLecturas().get(i);
+                    Lectura anterior = apartamento.getHistorialLecturas().get(i - 1);
+
+                    // La lectura inicial siempre debe ser la lectura actual del mes anterior
+                    double nuevaInicial = anterior.getLecturaActual();
+                    double nuevaActual = actual.getLecturaActual(); // no cambia, solo se recalcula consumo
+                    actual.setLecturas(nuevaInicial, nuevaActual);
+                }
+            }
 
             cargarTabla();
             JOptionPane.showMessageDialog(this, "Nueva lectura registrada correctamente.");
             txtLecturaActual.setText("");
-            txtFechaActual.setText(LocalDate.now().toString()); // ✅ reinicia con fecha de hoy
+            txtFechaActual.setText(LocalDate.now().toString());
 
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Ingrese un número válido para la lectura.");
@@ -134,7 +142,6 @@ apartamento.getHistorialLecturas().add(nueva);
             return;
         }
 
-        // Bloquear eliminación de la primera lectura
         if (filaSeleccionada == 0) {
             JOptionPane.showMessageDialog(this, "La primera lectura no puede eliminarse.");
             return;
@@ -149,6 +156,14 @@ apartamento.getHistorialLecturas().add(nueva);
 
         if (confirm == JOptionPane.YES_OPTION) {
             apartamento.getHistorialLecturas().remove(filaSeleccionada);
+
+            // Reajustar lectura inicial de la lectura siguiente
+            if (filaSeleccionada < apartamento.getHistorialLecturas().size()) {
+                Lectura siguiente = apartamento.getHistorialLecturas().get(filaSeleccionada);
+                Lectura anterior = apartamento.getHistorialLecturas().get(filaSeleccionada - 1);
+                siguiente.setLecturas(anterior.getLecturaActual(), siguiente.getLecturaActual());
+            }
+
             cargarTabla();
             JOptionPane.showMessageDialog(this, "Lectura eliminada correctamente.");
         }

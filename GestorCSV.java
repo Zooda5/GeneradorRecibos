@@ -66,11 +66,6 @@ public class GestorCSV {
                 LocalDate fechaInicial = LocalDate.parse(partes[5]);
                 LocalDate fechaActual = LocalDate.parse(partes[6]);
 
-                double consumo = Double.parseDouble(partes[7]);
-                double valorAcueducto = Double.parseDouble(partes[8]);
-                double valorAlcantarillado = Double.parseDouble(partes[9]);
-                double valorPagar = Double.parseDouble(partes[10]);
-
                 EstadoPago estado = EstadoPago.valueOf(partes[11]);
 
                 Apartamento apto = mapa.getOrDefault(
@@ -79,7 +74,6 @@ public class GestorCSV {
                 );
 
                 Lectura lectura = new Lectura(lecturaInicial, lecturaActual, fechaInicial, fechaActual);
-                lectura.setValores(consumo, valorAcueducto, valorAlcantarillado, valorPagar);
                 lectura.setEstado(estado);
 
                 apto.getHistorialLecturas().add(lectura);
@@ -95,3 +89,4 @@ public class GestorCSV {
         return apartamentos;
     }
 }
+

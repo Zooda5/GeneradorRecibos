@@ -17,36 +17,17 @@ public class Apartamento {
     }
 
     // Getters
-    public String getNumero() {
-        return numero;
-    }
-
-    public String getPropietario() {
-        return propietario;
-    }
-
-    public String getMedidor() {
-        return medidor;
-    }
-
-    public List<Lectura> getHistorialLecturas() {
-        return historialLecturas;
-    }
+    public String getNumero() { return numero; }
+    public String getPropietario() { return propietario; }
+    public String getMedidor() { return medidor; }
+    public List<Lectura> getHistorialLecturas() { return historialLecturas; }
 
     // Setters
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
+    public void setNumero(String numero) { this.numero = numero; }
+    public void setPropietario(String propietario) { this.propietario = propietario; }
+    public void setMedidor(String medidor) { this.medidor = medidor; }
 
-    public void setPropietario(String propietario) {
-        this.propietario = propietario;
-    }
-
-    public void setMedidor(String medidor) {
-        this.medidor = medidor;
-    }
-
-    // Métodos nuevos para ExcelManager
+    // Métodos nuevos
     public void agregarLectura(Lectura lectura) {
         historialLecturas.add(lectura);
     }
@@ -55,9 +36,7 @@ public class Apartamento {
      * Devuelve la última lectura registrada o null si no hay ninguna.
      */
     public Lectura getUltimaLectura() {
-        if (historialLecturas.isEmpty()) {
-            return null;
-        }
+        if (historialLecturas.isEmpty()) return null;
         return historialLecturas.get(historialLecturas.size() - 1);
     }
 
@@ -66,12 +45,33 @@ public class Apartamento {
      * Retorna 0 si hay menos de 2 lecturas.
      */
     public double getConsumoUltimoMes() {
-        if (historialLecturas.size() < 2) {
-            return 0;
-        }
+        if (historialLecturas.size() < 2) return 0;
         Lectura ultima = getUltimaLectura();
         Lectura anterior = historialLecturas.get(historialLecturas.size() - 2);
         return ultima.getValorPagar() - anterior.getValorPagar();
+    }
+
+    /**
+     * Ajusta todas las lecturas posteriores a partir de un índice,
+     * recalculando tanto lectura inicial como lectura actual y valores.
+     */
+    public void ajustarLecturasPosteriores(int desdeIndice, double diferenciaActual) {
+        for (int i = desdeIndice; i < historialLecturas.size(); i++) {
+            Lectura anterior = historialLecturas.get(i - 1);
+            Lectura actual = historialLecturas.get(i);
+
+            double nuevaLecturaInicial = anterior.getLecturaActual();
+            double nuevaLecturaActual = actual.getLecturaActual() + diferenciaActual;
+
+            Lectura ajustada = new Lectura(
+                    nuevaLecturaInicial,
+                    nuevaLecturaActual,
+                    actual.getFechaInicial(),
+                    actual.getFechaActual()
+            );
+
+            historialLecturas.set(i, ajustada);
+        }
     }
 
     @Override

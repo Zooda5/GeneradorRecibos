@@ -22,12 +22,15 @@ public class Lectura {
         this.fechaInicial = fechaInicial;
         this.fechaActual = fechaActual;
 
+        calcularConsumoYValores();
+        this.estado = EstadoPago.PENDIENTE; // por defecto
+    }
+
+    private void calcularConsumoYValores() {
         this.consumo = Math.max(0, lecturaActual - lecturaInicial);
         this.valorAcueducto = consumo * BaseDatos.getPrecioAcueducto();
         this.valorAlcantarillado = consumo * BaseDatos.getPrecioAlcantarillado();
         this.valorPagar = valorAcueducto + valorAlcantarillado;
-
-        this.estado = EstadoPago.PENDIENTE; // por defecto
     }
 
     // Getters
@@ -44,12 +47,11 @@ public class Lectura {
     // Setters
     public void setEstado(EstadoPago estado) { this.estado = estado; }
 
-    // Nuevo setter para leer valores exactos desde Excel
-    public void setValores(double consumo, double valorAcueducto, double valorAlcantarillado, double valorPagar) {
-        this.consumo = consumo;
-        this.valorAcueducto = valorAcueducto;
-        this.valorAlcantarillado = valorAlcantarillado;
-        this.valorPagar = valorPagar;
+    // Nuevo método para actualizar lecturas y recalcular valores
+    public void setLecturas(double nuevaInicial, double nuevaActual) {
+        this.lecturaInicial = nuevaInicial;
+        this.lecturaActual = nuevaActual;
+        calcularConsumoYValores();
     }
 
     @Override

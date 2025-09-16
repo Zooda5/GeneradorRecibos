@@ -141,13 +141,8 @@ public class RegistroApartamentoFrame extends JFrame {
                     if (opcion == JOptionPane.YES_OPTION) {
                         for (int i = 1; i < apartamento.getHistorialLecturas().size(); i++) {
                             Lectura l = apartamento.getHistorialLecturas().get(i);
-                            Lectura ajustada = new Lectura(
-                                    l.getLecturaInicial() + diferenciaInicial,
-                                    l.getLecturaActual() + diferenciaActual,
-                                    l.getFechaInicial(),
-                                    l.getFechaActual()
-                            );
-                            apartamento.getHistorialLecturas().set(i, ajustada);
+                            // Recalcular lectura inicial y actual, y actualizar consumo/valores
+                            l.setLecturas(l.getLecturaInicial() + diferenciaInicial, l.getLecturaActual() + diferenciaActual);
                         }
                     }
                 }

@@ -10,7 +10,6 @@ import java.util.List;
 
 public class ExcelManager {
 
-    // Ruta base: carpeta del programa
     private static final String RUTA_BASE = System.getProperty("user.dir") + File.separator;
 
     private static File obtenerCarpetaApartamento(String numeroApto) {
@@ -47,7 +46,6 @@ public class ExcelManager {
                 });
             }
 
-            // Limpiar filas existentes
             int lastRow = sheet.getLastRowNum();
             for (int i = 1; i <= lastRow; i++) {
                 Row row = sheet.getRow(i);
@@ -187,14 +185,9 @@ public class ExcelManager {
                         LocalDate fechaInicial = LocalDate.parse(getCellString(fila, 1, LocalDate.now().toString()));
                         double lecturaActual = getCellNumeric(fila, 2);
                         LocalDate fechaActual = LocalDate.parse(getCellString(fila, 3, LocalDate.now().toString()));
-                        double consumo = getCellNumeric(fila, 4);
-                        double valorAcueducto = getCellNumeric(fila, 5);
-                        double valorAlcantarillado = getCellNumeric(fila, 6);
-                        double valorPagar = getCellNumeric(fila, 7);
                         EstadoPago estado = EstadoPago.valueOf(getCellString(fila, 8, "PENDIENTE"));
 
                         Lectura lectura = new Lectura(lecturaInicial, lecturaActual, fechaInicial, fechaActual);
-                        lectura.setValores(consumo, valorAcueducto, valorAlcantarillado, valorPagar);
                         lectura.setEstado(estado);
 
                         apto.agregarLectura(lectura);
